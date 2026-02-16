@@ -28,7 +28,12 @@ function init() {
     renderDaySelector();
     renderTasks();
     applyTheme();
-    
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
+
     // Event Listeners
     addTaskBtn.addEventListener('click', () => modalOverlay.classList.add('active'));
     closeModalBtn.addEventListener('click', () => modalOverlay.classList.remove('active'));
@@ -63,7 +68,7 @@ function renderDaySelector() {
 function renderTasks() {
     const tasks = state.tasks[state.currentDay] || [];
     currentDayLabel.textContent = DAYS_FULL[state.currentDay];
-    
+
     if (tasks.length === 0) {
         taskList.innerHTML = `
             <div class="empty-state">
@@ -81,7 +86,7 @@ function renderTasks() {
 
     tasks.forEach((task, index) => {
         if (task.completed) completedCount++;
-        
+
         const card = document.createElement('div');
         card.className = `task-card ${task.completed ? 'completed' : ''}`;
         card.innerHTML = `
@@ -133,19 +138,19 @@ function handleAddTask(e) {
     state.tasks[state.currentDay].push(newTask);
     saveData();
     renderTasks();
-    
+
     // Reset and close
     taskForm.reset();
     modalOverlay.classList.remove('active');
 }
 
-window.toggleTask = function(index) {
+window.toggleTask = function (index) {
     state.tasks[state.currentDay][index].completed = !state.tasks[state.currentDay][index].completed;
     saveData();
     renderTasks();
 };
 
-window.deleteTask = function(index) {
+window.deleteTask = function (index) {
     if (confirm('この予定を削除しますか？')) {
         state.tasks[state.currentDay].splice(index, 1);
         saveData();
